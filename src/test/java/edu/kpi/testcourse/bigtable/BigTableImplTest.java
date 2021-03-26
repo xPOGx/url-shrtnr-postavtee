@@ -9,6 +9,8 @@ import edu.kpi.testcourse.rest.UsersController;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import javax.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
@@ -143,6 +145,40 @@ class BigTableImplTest {
     String getUrl = bigTable.getUrlFromDb(key);
 
     assertThat(getUrl).isEqualTo(link);
+  }
+
+  @Test
+  void checkMultipleDeletionUrl() {
+    BigTableImpl bigTable = new BigTableImpl();
+    String email = genData("email");
+    String password = genData("password");
+    Map<Integer, String> random = new HashMap<>();
+
+    JsonObject userObject = new JsonObject();
+    userObject.addProperty("email", email);
+    userObject.addProperty("password", password);
+    userObject.add("userLinks", new JsonArray());
+    bigTable.saveUserInDb("testKey", userObject);
+
+    bigTable.getUserFromDb("testKey");
+    for (int i = 0; i < 100; i++){
+      String url = genData("link");
+      String shorturl = genData("link");
+      bigTable.saveUrlInDb(url, shorturl);
+      random.put(i,url);
+
+    }
+    for (int i = 0; i < 100; i= i+2){
+      bigTable.delUrlFromDb(random.get(i));
+    }
+    for (int i = 1; i < 100; i= i+2){
+      assertThat(bigTable.getUrlFromDb(random.get(i))).isNotNull();
+    }
+  }
+
+  @Test
+  void check(){
+
   }
 }
 
