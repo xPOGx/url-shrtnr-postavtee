@@ -163,10 +163,9 @@ class BigTableImplTest {
     bigTable.getUserFromDb("testKey");
     for (int i = 0; i < 100; i++){
       String url = genData("link");
-      String shorturl = genData("link");
-      bigTable.saveUrlInDb(url, shorturl);
+      String shortUrl = genData("link");
+      bigTable.saveUrlInDb(url, shortUrl);
       random.put(i,url);
-
     }
     for (int i = 0; i < 100; i= i+2){
       bigTable.delUrlFromDb(random.get(i));
@@ -177,8 +176,14 @@ class BigTableImplTest {
   }
 
   @Test
-  void check(){
-
+  void checkUrlsMatching(){
+    BigTableImpl bigTable = new BigTableImpl();
+    for (int i = 0; i < 100; i++) {
+      String url = genData("link");
+      String shortUrl = genData("link");
+      bigTable.saveUrlInDb(url, shortUrl);
+      assertThat(bigTable.getUrlFromDb(url)).isEqualTo(shortUrl);
+    }
   }
 }
 
